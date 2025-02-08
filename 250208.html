@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MLB九局職棒 球員分析系統</title>
+    <style>
+        /* MLB配色風格（初始樣式） */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f2f3f5;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            flex-direction: column;
+        }
+        .container {
+            width: 90%;
+            max-width: 600px;
+            padding: 10px 20px 30px;
+            background-color: #ffffff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            overflow-x: auto;
+        }
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #000;
+        }
+        label {
+            display: block;
+            margin-top: 10px;
+            margin-bottom: 3px;
+        }
+        .required {
+            color: red;
+            font-size: 1.2em;
+            vertical-align: top;
+            margin-left: 2px;
+        }
+        input, select {
+            width: 100%;
+            padding: 5px;
+            margin-top: 5px;
+            border-radius: 5px;
+            border: 1px solid #d1d1d1;
+            font-size: 0.8em;
+            text-align: left;
+            box-sizing: border-box;
+        }
+        .button {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            background-color: #c8102e;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.8em;
+            margin-top: 10px;
+            text-align: left;
+        }
+        .button:hover {
+            background-color: #a00d23;
+        }
+        .hidden {
+            display: none;
+        }
+        /* 表格樣式 */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 3px;
+            text-align: center;
+            white-space: nowrap;
+            vertical-align: middle;
+            font-size: 0.85em;
+            font-weight: bold;
+        }
+        /* 預設的 thead 樣式可先放這裡，稍後以JS動態覆蓋 */
+        thead tr:first-child th {
+            background-color: #023e7d;
+            color: #ffffff;
+            font-size: 1.2em;
+            font-weight: bold;
+            padding: 10px;
+        }
+        th {
+            background-color: #0353a4;
+            color: #ffffff;
+            font-size: 1.0em;
+        }
+        tbody tr:last-child td {
+            background-color: #fff;
+            color: #000;
+            font-size: 1.0em;
+            font-weight: bold;
+        }
+        input[type="checkbox"] {
+            display: inline-block;
+            transform: scale(1.0); 
+            margin: 0 auto;
+            vertical-align: middle;
+        }
+        .result {
+            font-weight: bold;
+            font-size: 0.9em;
+        }
+        .result1 {
+            font-weight: bold;
+            font-size: 0.9em;
+        }
+        footer {
+            margin-top: 20px; 
+            text-align: center; 
+            font-size: 0.8em; 
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+
+<!-- 頁面一：基本輸入 -->
+<div id="page1" class="container">
+    <h2>MLB九局職棒 球員能力值表格</h2>
+    <p style="text-align: center; color: #888; font-size: 0.9em; margin-top: -10px;">
+        請至少填寫球隊 (Team) 與位置 (Position)
+    </p>
+    <label id="playerNameLabel" for="playerName">
+        名稱 (Name) <!-- 非必填 -->
+    </label>
+    <input type="text" id="playerName" placeholder="可選填：球員名稱">
+
+    <label id="yearLabel" for="year">
+        年份 (Years) <!-- 非必填 -->
+    </label>
+    <input type="text" id="year" placeholder="可選填：年份">
+
+    <label id="teamLabel" for="team">
+        球隊 (Team)<span class="required">*</span>
+    </label>
+    <select id="team">
+        <option disabled selected value="">選擇所屬隊伍</option>
+        <!-- AL East -->
+        <optgroup label="AL EAST">
+            <option value="NYY">NYY</option>
+            <option value="BOS">BOS</option>
+            <option value="TB">TB</option>
+            <option value="TOR">TOR</option>
+            <option value="BAL">BAL</option>
+        </optgroup>
+        <!-- AL Central -->
+        <optgroup label="AL CENTRAL">
+            <option value="MIN">MIN</option>
+            <option value="DET">DET</option>
+            <option value="CWS">CWS</option>
+            <option value="CLE">CLE</option>
+            <option value="KC">KC</option>
+        </optgroup>
+        <!-- AL West -->
+        <optgroup label="AL WEST">
+            <option value="LAA">LAA</option>
+            <option value="TEX">TEX</option>
+            <option value="SEA">SEA</option>
+            <option value="OAK">OAK</option>
+            <option value="HOU">HOU</option>
+        </optgroup>
+        <!-- NL East -->
+        <optgroup label="NL EAST">
+            <option value="PHI">PHI</option>
+            <option value="MIA">MIA</option>
+            <option value="ATL">ATL</option>
+            <option value="NYM">NYM</option>
+            <option value="WSH">WSH</option>
+        </optgroup>
+        <!-- NL Central -->
+        <optgroup label="NL CENTRAL">
+            <option value="STL">STL</option>
+            <option value="CHC">CHC</option>
+            <option value="MIL">MIL</option>
+            <option value="CIN">CIN</option>
+            <option value="PIT">PIT</option>
+        </optgroup>
+        <!-- NL West -->
+        <optgroup label="NL WEST">
+            <option value="LAD">LAD</option>
+            <option value="COL">COL</option>
+            <option value="SF">SF</option>
+            <option value="SD">SD</option>
+            <option value="AZ">AZ</option>
+        </optgroup>
+    </select>
+
+    <label id="cardTypeLabel" for="cardType">
+        類型 (CardType) <!-- 非必填 -->
+    </label>
+    <select id="cardType">
+        <option disabled selected value="">可選填：卡片類型</option>
+        <option value="Normal">一般</option>
+        <option value="Classic">經典</option>
+        <option value="Prime">全盛</option>
+        <option value="All Star">全明星</option>
+        <option value="Signature">簽名</option>
+        <option value="Legend">傳說</option>
+        <option value="Historic">卓越</option>
+    </select>
+
+    <label id="positionLabel" for="position">
+        位置 (Position)<span class="required">*</span>
+    </label>
+    <select id="position" style="margin-top: 5px;">
+        <option disabled selected value="">選擇球員位置</option>
+        <optgroup label="打者">
+            <option value="C">C</option>
+            <option value="1B">1B</option>
+            <option value="2B">2B</option>
+            <option value="SS">SS</option>
+            <option value="3B">3B</option>
+            <option value="OF">OF</option>
+            <option value="DH">DH</option>
+        </optgroup>
+        <optgroup label="投手">
+            <option value="SP">SP</option>
+            <option value="RP">RP</option>
+            <option value="CP">CP</option>
+        </optgroup>
+    </select>
+
+    <button id="startAnalysisButton" class="button" onclick="showPage2()" 
+        style="text-align: center; padding-left: 12px; font-weight: bold; margin-top: 30px;">
+        開啟表格
+    </button>     
+</div>
+
+
+<!-- 頁面二：能力值輸入與計算結果 -->
+<div id="page2" class="container hidden">
+    <h2 style="margin-top: 15px;">MLB九局職棒 球員能力值表格</h2>
+
+    <!-- 表格 -->
+    <table>
+        <thead>
+            <tr>
+                <th colspan="2" id="cardTypeAbbreviation" style="text-align: center; padding-left: 10px;">-</th>
+                <th colspan="5" id="header" style="text-align: center;">-</th>
+                <th id="playerPosition" style="text-align: center; padding-right: 10px;">-</th>
+            </tr>
+            <tr id="statHeaders"></tr>
+        </thead>
+        <tbody>
+            <!-- 基礎值 -->
+            <tr>
+                <td><input type="checkbox" id="includeBase" checked onchange="calculate()"></td>
+                <td>基礎值</td>
+                <td><input type="number" class="input-stat" id="base1" value="0" oninput="validatePositive(this);calculate()"></td>
+                <td><input type="number" class="input-stat" id="base2" value="0" oninput="validatePositive(this);calculate()"></td>
+                <td><input type="number" class="input-stat" id="base3" value="0" oninput="validatePositive(this);calculate()"></td>
+                <td><input type="number" class="input-stat" id="base4" value="0" oninput="validatePositive(this);calculate()"></td>
+                <td><input type="number" class="input-stat" id="base5" value="0" oninput="validatePositive(this);calculate()"></td>
+                <td><span class="result" id="totalBase">0</span></td>
+            </tr>
+            <!-- 階級上升量 -->
+            <tr>
+                <td><input type="checkbox" id="includeLevel" checked onchange="calculate()"></td>
+                <td>階級上升量</td>
+                <td><input type="number" class="input-stat" id="level1" value="0" oninput="validatePositive(this);calculate()"></td>
+                <td><input type="number" class="input-stat" id="level2" value="0" oninput="validatePositive(this);calculate()"></td>
+                <td><input type="number" class="input-stat" id="level3" value="0" oninput="validatePositive(this);calculate()"></td>
+                <td><input type="number" class="input-stat" id="level4" value="0" oninput="validatePositive(this);calculate()"></td>
+                <td><input type="number" class="input-stat" id="level5" value="0" oninput="validatePositive(this);calculate()"></td>
+                <td><span class="result" id="totalLevel">0</span></td>
+            </tr>
+            <!-- 強化量 -->
+            <tr>
+                <td><input type="checkbox" id="includeEnhance" checked onchange="calculate()"></td>
+                <td>強化量</td>
+                <td><input type="number" class="input-stat" id="enhance1" value="0" oninput="validatePositive(this);calculate()"></td>
+                <td><input type="number" class="input-stat" id="enhance2" value="0" oninput="validatePositive(this);calculate()"></td>
+                <td><input type="number" class="input-stat" id="enhance3" value="0" oninput="validatePositive(this);calculate()"></td>
+                <td><input type="number" class="input-stat" id="enhance4" value="0" oninput="validatePositive(this);calculate()"></td>
+                <td><input type="number" class="input-stat" id="enhance5" value="0" oninput="validatePositive(this);calculate()"></td>
+                <td><span class="result" id="totalEnhance">0</span></td>
+            </tr>
+            <!-- 特別訓練 -->
+            <tr>
+                <td><input type="checkbox" id="includeSpecial" checked onchange="calculate()"></td>
+                <td>特別訓練</td>
+                <td><input type="number" class="input-stat" id="special1" value="0" oninput="validatePositive(this);calculate()"></td>
+                <td><input type="number" class="input-stat" id="special2" value="0" oninput="validatePositive(this);calculate()"></td>
+                <td><input type="number" class="input-stat" id="special3" value="0" oninput="validatePositive(this);calculate()"></td>
+                <td><input type="number" class="input-stat" id="special4" value="0" oninput="validatePositive(this);calculate()"></td>
+                <td><input type="number" class="input-stat" id="special5" value="0" oninput="validatePositive(this);calculate()"></td>
+                <td><span class="result" id="totalSpecial">0</span></td>
+            </tr>
+            <!-- 教練加成 -->
+            <tr>
+                <td><input type="checkbox" id="includeCoach" checked onchange="calculate()"></td>
+                <td>教練加成</td>
+                <td><input type="number" class="input-stat" id="coach1" value="0" oninput="validatePositive(this);calculate()"></td>
+                <td><input type="number" class="input-stat" id="coach2" value="0" oninput="validatePositive(this);calculate()"></td>
+                <td><input type="number" class="input-stat" id="coach3" value="0" oninput="validatePositive(this);calculate()"></td>
+                <td><input type="number" class="input-stat" id="coach4" value="0" oninput="validatePositive(this);calculate()"></td>
+                <td><input type="number" class="input-stat" id="coach5" value="0" oninput="validatePositive(this);calculate()"></td>
+                <td><span class="result" id="totalCoach">0</span></td>
+            </tr>
+            <!-- 技能加成 -->
+            <tr>
+                <td><input type="checkbox" id="includeSkill" checked onchange="calculate()"></td>
+                <td>技能加成</td>
+                <td><input type="number" class="input-stat" id="skill1" value="0" oninput="validatePositive(this);calculate()"></td>
+                <td><input type="number" class="input-stat" id="skill2" value="0" oninput="validatePositive(this);calculate()"></td>
+                <td><input type="number" class="input-stat" id="skill3" value="0" oninput="validatePositive(this);calculate()"></td>
+                <td><input type="number" class="input-stat" id="skill4" value="0" oninput="validatePositive(this);calculate()"></td>
+                <td><input type="number" class="input-stat" id="skill5" value="0" oninput="validatePositive(this);calculate()"></td>
+                <td><span class="result" id="totalSkill">0</span></td>
+            </tr>
+            <!-- 裝備加成 -->
+            <tr>
+                <td><input type="checkbox" id="includeEquip" checked onchange="calculate()"></td>
+                <td>裝備加成</td>
+                <td colspan="1">
+                    <select id="equip1" class="input-stat" onchange="calculate()">
+                        <option value="0">0</option>
+                        <option value="1">1</option><option value="2">2</option>
+                        <option value="3">3</option><option value="4">4</option>
+                        <option value="5">5</option><option value="6">6</option>
+                        <option value="8">8</option><option value="10">10</option>
+                    </select>
+                </td>
+                <td colspan="1">
+                    <select id="equip2" class="input-stat" onchange="calculate()">
+                        <option value="0">0</option>
+                        <option value="1">1</option><option value="2">2</option>
+                        <option value="3">3</option><option value="4">4</option>
+                        <option value="5">5</option><option value="6">6</option>
+                        <option value="8">8</option><option value="10">10</option>
+                    </select>
+                </td>
+                <td colspan="1">
+                    <select id="equip3" class="input-stat" onchange="calculate()">
+                        <option value="0">0</option>
+                        <option value="1">1</option><option value="2">2</option>
+                        <option value="3">3</option><option value="4">4</option>
+                        <option value="5">5</option><option value="6">6</option>
+                        <option value="8">8</option><option value="10">10</option>
+                    </select>
+                </td>
+                <td colspan="1">
+                    <select id="equip4" class="input-stat" onchange="calculate()">
+                        <option value="0">0</option>
+                        <option value="1">1</option><option value="2">2</option>
+                        <option value="3">3</option><option value="4">4</option>
+                        <option value="5">5</option><option value="6">6</option>
+                        <option value="8">8</option><option value="10">10</option>
+                    </select>
+                </td>
+                <td colspan="1">
+                    <select id="equip5" class="input-stat" onchange="calculate()">
+                        <option value="0">0</option>
+                        <option value="1">1</option><option value="2">2</option>
+                        <option value="3">3</option><option value="4">4</option>
+                        <option value="5">5</option><option value="6">6</option>
+                        <option value="8">8</option><option value="10">10</option>
+                    </select>
+                </td>
+                <td><span class="result" id="totalEquip">0</span></td>
+            </tr>
+            <!-- 團隊加成 -->
+            <tr>
+                <td><input type="checkbox" id="includeTeamBonus" checked onchange="calculate()"></td>
+                <td>團隊/簽名加成</td>
+                <td colspan="5">
+                    <select id="teamBonus" class="input-stat" onchange="calculate()">
+                        <option value="0">0</option>
+                        <option value="1">1</option><option value="2">2</option>
+                        <option value="3">3</option><option value="4">4</option>
+                        <option value="5">5</option><option value="6">6</option>
+                        <option value="7">7</option><option value="8">8</option>
+                        <option value="9">9</option><option value="10">10</option>
+                        <option value="12">12</option><option value="14">14</option>
+                        <option value="16">16</option><option value="18">18</option>
+                        <option value="20">20</option><option value="24">24</option>
+                    </select>
+                </td>
+                <td><span class="result" id="totalTeam">0</span></td>
+            </tr>
+            <!-- 飲料加成 -->
+            <tr>
+                <td><input type="checkbox" id="includeDrinks" checked onchange="calculate()"></td>
+                <td>飲料加成</td>
+                <td colspan="5">
+                    <select id="teamDrinks" class="input-stat" onchange="calculate()">
+                        <option value="0">0</option>
+                        <option value="-3">-3</option><option value="3">3</option>
+                        <option value="6">6</option>
+                    </select>
+                </td>
+                <td><span class="result" id="totalDrinks">0</span></td>
+            </tr>
+            <!-- 指導球員 -->
+            <tr>
+                <td><input type="checkbox" id="includeMentor" checked onchange="calculate()"></td>
+                <td>指導球員</td>
+                <td colspan="5">
+                    <select id="teamMentor" class="input-stat" onchange="calculate()">
+                        <option value="0">0</option>
+                        <option value="1">1</option><option value="2">2</option>
+                        <option value="3">3</option><option value="4">4</option>
+                        <option value="5">5</option>
+                    </select>
+                </td>
+                <td><span class="result" id="totalMentor">0</span></td>
+            </tr>
+            <!-- 黑鑽加成 -->
+            <tr>
+                <td><input type="checkbox" id="includeDiamond" checked onchange="calculate()"></td>
+                <td>黑鑽加成</td>
+                <td colspan="5">
+                    <select id="teamDiamond" class="input-stat" onchange="calculate()">
+                        <option value="0">0</option>
+                        <option value="1">1</option><option value="2">2</option>
+                    </select>
+                </td>
+                <td><span class="result" id="totalDiamond">0</span></td>
+            </tr>
+            <!-- 總能力值 -->
+            <tr>
+                <td colspan="2">總評</td>
+                <td><span class="result1" id="overall1">0</span></td>
+                <td><span class="result1" id="overall2">0</span></td>
+                <td><span class="result1" id="overall3">0</span></td>
+                <td><span class="result1" id="overall4">0</span></td>
+                <td><span class="result1" id="overall5">0</span></td>
+                <td><span class="result1" id="overallTotal">0</span></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <!-- 將「返回上一頁」按鈕移到表格下方 -->
+    <button class="button" style="margin-top: 20px; background-color:#888;" onclick="goBack()">
+        返回上一頁
+    </button>
+</div>
+
+<script>
+    /****************************************
+     * MLB 30隊配色 (只用來改thead顏色)    *
+     ****************************************/
+    const teamDesign = {
+      "NYY": { primaryColor: "#0C2340", textColor: "#FFFFFF" },
+      "BOS": { primaryColor: "#BD3039", textColor: "#FFFFFF" },
+      "TB":  { primaryColor: "#092C5C", textColor: "#FFFFFF" },
+      "TOR": { primaryColor: "#134A8E", textColor: "#FFFFFF" },
+      "BAL": { primaryColor: "#DF4601", textColor: "#000000" },
+      "MIN": { primaryColor: "#002B5C", textColor: "#FFFFFF" },
+      "DET": { primaryColor: "#0C2340", textColor: "#FFFFFF" },
+      "CWS": { primaryColor: "#27251F", textColor: "#FFFFFF" },
+      "CLE": { primaryColor: "#0C2340", textColor: "#FFFFFF" },
+      "KC":  { primaryColor: "#004687", textColor: "#FFFFFF" },
+      "LAA": { primaryColor: "#BA0021", textColor: "#FFFFFF" },
+      "TEX": { primaryColor: "#003278", textColor: "#FFFFFF" },
+      "SEA": { primaryColor: "#0C2C56", textColor: "#FFFFFF" },
+      "OAK": { primaryColor: "#003831", textColor: "#FFFFFF" },
+      "HOU": { primaryColor: "#002D62", textColor: "#FFFFFF" },
+      "PHI": { primaryColor: "#E81828", textColor: "#FFFFFF" },
+      "MIA": { primaryColor: "#00A3E0", textColor: "#000000" },
+      "ATL": { primaryColor: "#CE1141", textColor: "#FFFFFF" },
+      "NYM": { primaryColor: "#002D72", textColor: "#FFFFFF" },
+      "WSH": { primaryColor: "#AB0003", textColor: "#FFFFFF" },
+      "STL": { primaryColor: "#C41E3A", textColor: "#FFFFFF" },
+      "CHC": { primaryColor: "#0E3386", textColor: "#FFFFFF" },
+      "MIL": { primaryColor: "#FFC52F", textColor: "#12284B" },
+      "CIN": { primaryColor: "#C6011F", textColor: "#FFFFFF" },
+      "PIT": { primaryColor: "#FDB827", textColor: "#000000" },
+      "LAD": { primaryColor: "#005A9C", textColor: "#FFFFFF" },
+      "COL": { primaryColor: "#33006F", textColor: "#FFFFFF" },
+      "SF":  { primaryColor: "#FD5A1E", textColor: "#000000" },
+      "SD":  { primaryColor: "#2F241D", textColor: "#FFFFFF" },
+      "AZ":  { primaryColor: "#A71930", textColor: "#FFFFFF" }
+    };
+
+    // 切換至第二頁
+    function showPage2() {
+        const playerName = document.getElementById("playerName").value;
+        const year = document.getElementById("year").value;
+        const team = document.getElementById("team").value;
+        const cardType = document.getElementById("cardType").value;
+        const position = document.getElementById("position").value;
+
+        // 只檢查 team & position
+        if (!team || !position) {
+            alert("請至少填寫『球隊』與『位置』才能進行分析！");
+            return;
+        }
+
+        // 更新表頭文字（若未填則顯示 - ）
+        document.getElementById("cardTypeAbbreviation").innerText = cardType || "-";
+        const namePart = playerName ? playerName : "";
+        const yearPart = year ? ` (${year})` : "";
+        document.getElementById("header").innerText = namePart + yearPart + (team ? ` - ${team}` : "-");
+        document.getElementById("playerPosition").innerText = position || "-";
+
+        // 動態更新各能力名稱
+        updateStatHeaders(position);
+
+        // 僅修改 thead 的背景/文字色
+        const theadElement = document.querySelector("#page2 table thead");
+        if (teamDesign[team]) {
+            const { primaryColor, textColor } = teamDesign[team];
+            // 逐格改色 (避免CSS層級衝突)
+            theadElement.querySelectorAll("th").forEach(th => {
+                th.style.backgroundColor = primaryColor;
+                th.style.color = textColor;
+            });
+        } else {
+            // 若無對應配色，保留預設
+            theadElement.querySelectorAll("th").forEach(th => {
+                th.style.backgroundColor = "#023e7d";
+                th.style.color = "#ffffff";
+            });
+        }
+
+        // 顯示第二頁並隱藏第一頁
+        document.getElementById("page1").classList.add("hidden");
+        document.getElementById("page2").classList.remove("hidden");
+    }
+
+    // 返回上一頁
+    function goBack() {
+        document.getElementById("page2").classList.add("hidden");
+        document.getElementById("page1").classList.remove("hidden");
+    }
+
+    // 更新表頭欄位
+    function updateStatHeaders(position) {
+        const statHeaders = document.getElementById("statHeaders");
+        if (["C", "1B", "2B", "SS", "3B", "OF", "DH"].includes(position)) {
+            statHeaders.innerHTML = `
+                <th colspan="2">項目</th>
+                <th>接觸</th>
+                <th>力量</th>
+                <th>選球</th>
+                <th>速度</th>
+                <th>守備</th>
+                <th>加總/平均</th>
+            `;
+        } else if (["SP", "RP", "CP"].includes(position)) {
+            statHeaders.innerHTML = `
+                <th colspan="2">項目</th>
+                <th>控球</th>
+                <th>球威</th>
+                <th>體力</th>
+                <th>直球</th>
+                <th>變化</th>
+                <th>加總/平均</th>
+            `;
+        } else {
+            statHeaders.innerHTML = `
+                <th colspan="2">項目</th>
+                <th>能力1</th>
+                <th>能力2</th>
+                <th>能力3</th>
+                <th>能力4</th>
+                <th>能力5</th>
+                <th>加總/平均</th>
+            `;
+        }
+    }
+
+    // 自動保存
+    document.querySelectorAll('input, select').forEach(input => {
+        input.addEventListener('input', () => {
+            localStorage.setItem(input.id, input.value);
+        });
+    });
+    window.onload = () => {
+        document.querySelectorAll('input, select').forEach(input => {
+            input.value = localStorage.getItem(input.id) || '';
+        });
+        sessionStorage.setItem("isPageReloaded", "true"); 
+    };
+    document.addEventListener("visibilitychange", () => {
+        if (document.visibilityState === "hidden") {
+            sessionStorage.removeItem("isPageReloaded"); 
+        }
+    });
+    window.addEventListener('beforeunload', (event) => {
+        if (!sessionStorage.getItem("isPageReloaded")) { 
+            document.querySelectorAll('input, select').forEach(input => {
+                localStorage.removeItem(input.id);
+            });
+        }
+    });
+
+    // 確保輸入值非負
+    function validatePositive(input) {
+        if (input.value < 0) {
+            input.value = 0;
+        }
+    }
+
+    // 計算能力值
+    function calculate() {
+        function calcTotal(rowPrefix, outputId, isAverage = false) {
+            let sum = 0;
+            for (let i = 1; i <= 5; i++) {
+                sum += parseInt(document.getElementById(rowPrefix + i).value) || 0;
+            }
+            document.getElementById(outputId).innerText = isAverage ? (sum / 5).toFixed(1) : sum;
+            return sum;
+        }
+        function applyColorBasedOnValue(element, value) {
+            if (value < 65)      element.style.color = "#82808B";
+            else if (value < 80) element.style.color = "#878476";
+            else if (value < 100)element.style.color = "#B49011";
+            else if (value < 120)element.style.color = "#D7A415";
+            else if (value < 130)element.style.color = "#F07912";
+            else if (value < 140)element.style.color = "#F54D11";
+            else                 element.style.color = "#FF002D";
+        }
+
+        const baseTotal     = document.getElementById("includeBase").checked     ? calcTotal("base", "totalBase", true) : 0;
+        const levelTotal    = document.getElementById("includeLevel").checked    ? calcTotal("level", "totalLevel")     : 0;
+        const enhanceTotal  = document.getElementById("includeEnhance").checked  ? calcTotal("enhance", "totalEnhance") : 0;
+        const specialTotal  = document.getElementById("includeSpecial").checked  ? calcTotal("special", "totalSpecial") : 0;
+        const coachTotal    = document.getElementById("includeCoach").checked    ? calcTotal("coach", "totalCoach")     : 0;
+        const skillTotal    = document.getElementById("includeSkill").checked    ? calcTotal("skill", "totalSkill")     : 0;
+        const equipTotal    = document.getElementById("includeEquip").checked    ? calcTotal("equip", "totalEquip")     : 0;
+        const teamBonus     = document.getElementById("includeTeamBonus").checked? (parseInt(document.getElementById("teamBonus").value) || 0) * 5 : 0;
+        const drinkTotal    = document.getElementById("includeDrinks").checked   ? (parseInt(document.getElementById("teamDrinks").value) || 0) * 5 : 0;
+        const mentorTotal   = document.getElementById("includeMentor").checked   ? (parseInt(document.getElementById("teamMentor").value) || 0) * 5 : 0;
+        const diamondTotal  = document.getElementById("includeDiamond").checked  ? (parseInt(document.getElementById("teamDiamond").value) || 0) * 5 : 0;
+
+        // 顯示行小計
+        document.getElementById("totalTeam").innerText   = teamBonus;
+        document.getElementById("totalDrinks").innerText = drinkTotal;
+        document.getElementById("totalMentor").innerText = mentorTotal;
+        document.getElementById("totalDiamond").innerText= diamondTotal;
+
+        // 分別計算 5 個能力欄位
+        for (let i = 1; i <= 5; i++) {
+            let finalValue = 0;
+            if (document.getElementById("includeBase").checked)       finalValue += parseInt(document.getElementById("base" + i).value) || 0;
+            if (document.getElementById("includeLevel").checked)      finalValue += parseInt(document.getElementById("level" + i).value) || 0;
+            if (document.getElementById("includeEnhance").checked)    finalValue += parseInt(document.getElementById("enhance" + i).value) || 0;
+            if (document.getElementById("includeSpecial").checked)    finalValue += parseInt(document.getElementById("special" + i).value) || 0;
+            if (document.getElementById("includeCoach").checked)      finalValue += parseInt(document.getElementById("coach" + i).value) || 0;
+            if (document.getElementById("includeSkill").checked)      finalValue += parseInt(document.getElementById("skill" + i).value) || 0;
+            if (document.getElementById("includeEquip").checked)      finalValue += parseInt(document.getElementById("equip" + i).value) || 0;
+            if (document.getElementById("includeTeamBonus").checked)  finalValue += teamBonus / 5;
+            if (document.getElementById("includeDrinks").checked)     finalValue += drinkTotal / 5;
+            if (document.getElementById("includeMentor").checked)     finalValue += mentorTotal / 5;
+            if (document.getElementById("includeDiamond").checked)    finalValue += diamondTotal / 5;
+
+            const overallElement = document.getElementById("overall" + i);
+            overallElement.innerText = finalValue.toFixed(0);
+            applyColorBasedOnValue(overallElement, finalValue);
+        }
+
+        // 計算總評平均
+        let overallSum = 0;
+        for (let i = 1; i <= 5; i++) {
+            overallSum += parseFloat(document.getElementById("overall" + i).innerText) || 0;
+        }
+        const overallTotalElement = document.getElementById("overallTotal");
+        const overallTotalValue = (overallSum / 5).toFixed(1);
+        overallTotalElement.innerText = overallTotalValue;
+        applyColorBasedOnValue(overallTotalElement, parseFloat(overallTotalValue));
+    }
+</script>
+
+<!-- Footer 版權區域 -->
+<footer>
+    © 2024 君不見高屏溪水天上來. All rights reserved.
+</footer>
+</body>
+</html>

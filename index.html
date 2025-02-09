@@ -1,131 +1,243 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MLB九局職棒 球員分析系統</title>
-    <style>
-        /* MLB配色風格（初始樣式） */
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f2f3f5;
-            color: #333;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            flex-direction: column;
-        }
-        .container {
-            width: 90%;
-            max-width: 600px;
-            padding: 10px 20px 30px;
-            background-color: #ffffff;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            border-radius: 10px;
-            overflow-x: auto;
-        }
-        h2 {
-            text-align: center;
-            margin-bottom: 20px;
-            color: #000;
-        }
-        label {
-            display: block;
-            margin-top: 10px;
-            margin-bottom: 3px;
-        }
-        .required {
-            color: red;
-            font-size: 1.2em;
-            vertical-align: top;
-            margin-left: 2px;
-        }
-        input, select {
-            width: 100%;
-            padding: 5px;
-            margin-top: 5px;
-            border-radius: 5px;
-            border: 1px solid #d1d1d1;
-            font-size: 0.8em;
-            text-align: left;
-            box-sizing: border-box;
-        }
-        .button {
-            display: block;
-            width: 100%;
-            padding: 10px;
-            background-color: #c8102e;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 0.8em;
-            margin-top: 10px;
-            text-align: left;
-        }
-        .button:hover {
-            background-color: #a00d23;
-        }
-        .hidden {
-            display: none;
-        }
-        /* 表格樣式 */
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        th, td {
-            border: 1px solid #ddd;
-            padding: 3px;
-            text-align: center;
-            white-space: nowrap;
-            vertical-align: middle;
-            font-size: 0.85em;
-            font-weight: bold;
-        }
-        /* 預設的 thead 樣式可先放這裡，稍後以JS動態覆蓋 */
-        thead tr:first-child th {
-            background-color: #023e7d;
-            color: #ffffff;
-            font-size: 1.2em;
-            font-weight: bold;
-            padding: 10px;
-        }
-        th {
-            background-color: #0353a4;
-            color: #ffffff;
-            font-size: 1.0em;
-        }
-        tbody tr:last-child td {
-            background-color: #fff;
-            color: #000;
-            font-size: 1.0em;
-            font-weight: bold;
-        }
-        input[type="checkbox"] {
-            display: inline-block;
-            transform: scale(1.0); 
-            margin: 0 auto;
-            vertical-align: middle;
-        }
-        .result {
-            font-weight: bold;
-            font-size: 0.9em;
-        }
-        .result1 {
-            font-weight: bold;
-            font-size: 0.9em;
-        }
-        footer {
-            margin-top: 20px; 
-            text-align: center; 
-            font-size: 0.8em; 
-            color: #666;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>MLB九局職棒 球員分析系統</title>
+  <style>
+    /* MLB配色風格（初始樣式） */
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f2f3f5;
+        color: #000;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        flex-direction: column;
+    }
+    .container {
+        width: 90%;
+        max-width: 600px;
+        padding: 10px 20px 30px;
+        background-color: #ffffff;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        border-radius: 10px;
+        overflow-x: auto;
+        position: relative; /* 使內部絕對定位可用 */
+    }
+    h2 {
+        text-align: center;
+        margin-bottom: 20px;
+        color: #000;
+    }
+    label {
+        display: block;
+        margin-top: 10px;
+        margin-bottom: 3px;
+    }
+    .required {
+        color: red;
+        font-size: 1.2em;
+        vertical-align: top;
+        margin-left: 2px;
+    }
+    input, select, button {
+        font-size: 0.8em;
+    }
+    input, select {
+        width: 100%;
+        padding: 5px;
+        margin-top: 5px;
+        border-radius: 5px;
+        border: 1px solid #d1d1d1;
+        text-align: left;
+        box-sizing: border-box;
+    }
+    .button {
+        display: block;
+        width: 100%;
+        padding: 10px;
+        background-color: #c8102e;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        text-align: center;
+        margin-top: 10px;
+    }
+    .button:hover {
+        background-color: #a00d23;
+    }
+    .hidden {
+        display: none;
+    }
+    /* -------- 多欄下拉 (Multi-Column Dropdown) 的 CSS -------- */
+    .dropdown-container {
+        margin-top: 5px;
+        position: relative;
+    }
+    .dropdown-button {
+        width: 100%;
+        display: inline-block;
+        padding: 8px;
+        background-color: #ffffff;
+        color: #888;
+        border-radius: 5px;
+        border: 1px solid #d1d1d1;
+        text-align: left;
+        cursor: pointer;
+        /* 讓文字超出時可截斷或自行調整 */
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+    }
+    .dropdown-button:hover {
+        background-color: #eee;
+    }
+    .dropdown-content {
+        position: absolute;
+        top: 40px; /* 大約在按鈕下方 */
+        left: 0;
+        background-color: #fff;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        z-index: 999;
+        width: 100%;
+        max-height: 200px;
+        overflow-y: auto;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+        padding: 10px;
+        display: none; /* 預設隱藏 */
+    }
+    .dropdown-content.show {
+        display: block;
+    }
+    /* 分區多欄樣式 (flex) */
+    .multiColumn {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+    }
+    .divisionColumn {
+        width: 45%; /* 兩欄 (或依您需要再調) */
+        min-width: 200px;
+    }
+    .divisionColumn h4 {
+        margin-top: 0;
+        margin-bottom: 5px;
+        font-size: 0.9em;
+        color: #c8102e;
+        border-bottom: 1px solid #d1d1d1;
+        padding-bottom: 5px;
+    }
+    .divisionColumn div {
+        margin: 3px 0;
+        padding: 3px 5px;
+        cursor: pointer;
+        border-radius: 5px;
+    }
+    .divisionColumn div:hover {
+        background-color: #f4f4f4;
+    }
+
+    /* ---- 表格樣式 ---- */
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    th, td {
+        border: 1px solid #ddd;
+        padding: 3px;
+        text-align: center;
+        white-space: nowrap;
+        vertical-align: middle;
+        font-size: 0.85em;
+        font-weight: bold;
+    }
+    thead tr:first-child th {
+        background-color: #023e7d;
+        color: #ffffff;
+        font-size: 1.2em;
+        font-weight: bold;
+        padding: 10px;
+    }
+    th {
+        background-color: #0353a4;
+        color: #ffffff;
+        font-size: 1.0em;
+    }
+    tbody tr:last-child td {
+        background-color: #fff;
+        color: #000;
+        font-size: 1.0em;
+        font-weight: bold;
+    }
+    input[type="checkbox"] {
+        display: inline-block;
+        transform: scale(1.0); 
+        margin: 0 auto;
+        vertical-align: middle;
+    }
+    .result {
+        font-weight: bold;
+        font-size: 0.9em;
+    }
+    .result1 {
+        font-weight: bold;
+        font-size: 0.9em;
+    }
+    footer {
+        margin-top: 20px; 
+        text-align: center; 
+        font-size: 0.8em; 
+        color: #666;
+    }
+
+    /* 計算規則說明的提示區塊 */
+    .info-icon {
+        color: #444;
+        background-color: #ffd;
+        border: 1px solid #ccc;
+        border-radius: 50%;
+        display: inline-block;
+        width: 20px; 
+        height: 20px;
+        text-align: center;
+        cursor: pointer;
+        margin-left: 5px;
+    }
+    .info-box {
+        border: 1px solid #ccc;
+        background-color: #fffbe7;
+        padding: 8px;
+        margin-top: 5px;
+        font-size: 0.8em;
+        text-align: left;
+        position: relative;
+    }
+    .info-box.hidden {
+        display: none;
+    }
+    .info-box::before {
+        content: "";
+        position: absolute;
+        top: -10px;
+        left: 20px;
+        border: 10px solid transparent;
+        border-bottom: 10px solid #ccc;
+    }
+    .info-box::after {
+        content: "";
+        position: absolute;
+        top: -9px;
+        left: 20px;
+        border: 9px solid transparent;
+        border-bottom: 9px solid #fffbe7;
+    }
+  </style>
 </head>
 <body>
 
@@ -135,76 +247,96 @@
     <p style="text-align: center; color: #888; font-size: 0.9em; margin-top: -10px;">
         請至少填寫球隊 (Team) 與位置 (Position)
     </p>
-    <label id="playerNameLabel" for="playerName">
+
+    <label for="playerName">
         名稱 (Name) <!-- 非必填 -->
     </label>
-    <input type="text" id="playerName" placeholder="可選填：球員名稱">
+    <input type="text" id="playerName" placeholder="請填入球員名稱 (選填)">
 
-    <label id="yearLabel" for="year">
+    <label for="year">
         年份 (Years) <!-- 非必填 -->
     </label>
-    <input type="text" id="year" placeholder="可選填：年份">
+    <input type="text" id="year" placeholder="請填入球員年份 (選填)">
 
-    <label id="teamLabel" for="team">
+    <!-- 自訂多欄下拉 - 開始 -->
+    <label>
         球隊 (Team)<span class="required">*</span>
     </label>
-    <select id="team">
-        <option disabled selected value="">選擇所屬隊伍</option>
-        <!-- AL East -->
-        <optgroup label="AL EAST">
-            <option value="NYY">NYY</option>
-            <option value="BOS">BOS</option>
-            <option value="TB">TB</option>
-            <option value="TOR">TOR</option>
-            <option value="BAL">BAL</option>
-        </optgroup>
-        <!-- AL Central -->
-        <optgroup label="AL CENTRAL">
-            <option value="MIN">MIN</option>
-            <option value="DET">DET</option>
-            <option value="CWS">CWS</option>
-            <option value="CLE">CLE</option>
-            <option value="KC">KC</option>
-        </optgroup>
-        <!-- AL West -->
-        <optgroup label="AL WEST">
-            <option value="LAA">LAA</option>
-            <option value="TEX">TEX</option>
-            <option value="SEA">SEA</option>
-            <option value="OAK">OAK</option>
-            <option value="HOU">HOU</option>
-        </optgroup>
-        <!-- NL East -->
-        <optgroup label="NL EAST">
-            <option value="PHI">PHI</option>
-            <option value="MIA">MIA</option>
-            <option value="ATL">ATL</option>
-            <option value="NYM">NYM</option>
-            <option value="WSH">WSH</option>
-        </optgroup>
-        <!-- NL Central -->
-        <optgroup label="NL CENTRAL">
-            <option value="STL">STL</option>
-            <option value="CHC">CHC</option>
-            <option value="MIL">MIL</option>
-            <option value="CIN">CIN</option>
-            <option value="PIT">PIT</option>
-        </optgroup>
-        <!-- NL West -->
-        <optgroup label="NL WEST">
-            <option value="LAD">LAD</option>
-            <option value="COL">COL</option>
-            <option value="SF">SF</option>
-            <option value="SD">SD</option>
-            <option value="AZ">AZ</option>
-        </optgroup>
-    </select>
+    <!-- 用 hidden 來儲存實際選到的隊伍 -->
+    <input type="hidden" id="team" value="">
 
-    <label id="cardTypeLabel" for="cardType">
+    <div class="dropdown-container">
+        <!-- 按鈕初始文字改為 "選擇球隊" -->
+        <button type="button" class="dropdown-button" id="teamButton" onclick="toggleTeamDropdown()">
+            選擇球隊
+        </button>
+
+        <div id="teamDropdown" class="dropdown-content">
+            <div class="multiColumn">
+                <!-- AL EAST -->
+                <div class="divisionColumn">
+                    <h4>AL EAST</h4>
+                    <div onclick="selectTeam('NYY')">NYY</div>
+                    <div onclick="selectTeam('BOS')">BOS</div>
+                    <div onclick="selectTeam('TB')">TB</div>
+                    <div onclick="selectTeam('TOR')">TOR</div>
+                    <div onclick="selectTeam('BAL')">BAL</div>
+                </div>
+                <!-- AL CENTRAL -->
+                <div class="divisionColumn">
+                    <h4>AL CENTRAL</h4>
+                    <div onclick="selectTeam('MIN')">MIN</div>
+                    <div onclick="selectTeam('DET')">DET</div>
+                    <div onclick="selectTeam('CWS')">CWS</div>
+                    <div onclick="selectTeam('CLE')">CLE</div>
+                    <div onclick="selectTeam('KC')">KC</div>
+                </div>
+                <!-- AL WEST -->
+                <div class="divisionColumn">
+                    <h4>AL WEST</h4>
+                    <div onclick="selectTeam('LAA')">LAA</div>
+                    <div onclick="selectTeam('TEX')">TEX</div>
+                    <div onclick="selectTeam('SEA')">SEA</div>
+                    <div onclick="selectTeam('OAK')">OAK</div>
+                    <div onclick="selectTeam('HOU')">HOU</div>
+                </div>
+                <!-- NL EAST -->
+                <div class="divisionColumn">
+                    <h4>NL EAST</h4>
+                    <div onclick="selectTeam('PHI')">PHI</div>
+                    <div onclick="selectTeam('MIA')">MIA</div>
+                    <div onclick="selectTeam('ATL')">ATL</div>
+                    <div onclick="selectTeam('NYM')">NYM</div>
+                    <div onclick="selectTeam('WSH')">WSH</div>
+                </div>
+                <!-- NL CENTRAL -->
+                <div class="divisionColumn">
+                    <h4>NL CENTRAL</h4>
+                    <div onclick="selectTeam('STL')">STL</div>
+                    <div onclick="selectTeam('CHC')">CHC</div>
+                    <div onclick="selectTeam('MIL')">MIL</div>
+                    <div onclick="selectTeam('CIN')">CIN</div>
+                    <div onclick="selectTeam('PIT')">PIT</div>
+                </div>
+                <!-- NL WEST -->
+                <div class="divisionColumn">
+                    <h4>NL WEST</h4>
+                    <div onclick="selectTeam('LAD')">LAD</div>
+                    <div onclick="selectTeam('COL')">COL</div>
+                    <div onclick="selectTeam('SF')">SF</div>
+                    <div onclick="selectTeam('SD')">SD</div>
+                    <div onclick="selectTeam('AZ')">AZ</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- 自訂多欄下拉 - 結束 -->
+
+    <label for="cardType">
         類型 (CardType) <!-- 非必填 -->
     </label>
-    <select id="cardType">
-        <option disabled selected value="">可選填：卡片類型</option>
+    <select id="cardType" style="margin-top: 5px; color: #888;">
+        <option disabled selected value="">選擇卡片類型 (選填)</option>
         <option value="Normal">一般</option>
         <option value="Classic">經典</option>
         <option value="Prime">全盛</option>
@@ -214,10 +346,10 @@
         <option value="Historic">卓越</option>
     </select>
 
-    <label id="positionLabel" for="position">
+    <label for="position">
         位置 (Position)<span class="required">*</span>
     </label>
-    <select id="position" style="margin-top: 5px;">
+    <select id="position" style="margin-top: 5px; color: #888;">
         <option disabled selected value="">選擇球員位置</option>
         <optgroup label="打者">
             <option value="C">C</option>
@@ -235,8 +367,7 @@
         </optgroup>
     </select>
 
-    <button id="startAnalysisButton" class="button" onclick="showPage2()" 
-        style="text-align: center; padding-left: 12px; font-weight: bold; margin-top: 30px;">
+    <button id="startAnalysisButton" class="button" onclick="showPage2()">
         開啟表格
     </button>     
 </div>
@@ -246,7 +377,6 @@
 <div id="page2" class="container hidden">
     <h2 style="margin-top: 15px;">MLB九局職棒 球員能力值表格</h2>
 
-    <!-- 表格 -->
     <table>
         <thead>
             <tr>
@@ -254,6 +384,7 @@
                 <th colspan="5" id="header" style="text-align: center;">-</th>
                 <th id="playerPosition" style="text-align: center; padding-right: 10px;">-</th>
             </tr>
+            <!-- 這一行: 第一個欄位放「全選/全取消」總開關，其餘為欄位標題 -->
             <tr id="statHeaders"></tr>
         </thead>
         <tbody>
@@ -374,7 +505,7 @@
                 </td>
                 <td><span class="result" id="totalEquip">0</span></td>
             </tr>
-            <!-- 團隊加成 -->
+            <!-- 團隊/簽名加成 (問號在最後) -->
             <tr>
                 <td><input type="checkbox" id="includeTeamBonus" checked onchange="calculate()"></td>
                 <td>團隊/簽名加成</td>
@@ -385,13 +516,20 @@
                         <option value="3">3</option><option value="4">4</option>
                         <option value="5">5</option><option value="6">6</option>
                         <option value="7">7</option><option value="8">8</option>
-                        <option value="9">9</option><option value="10">10</option><option value="11">11</option>
+                        <option value="9">9</option><option value="10">10</option>
                         <option value="12">12</option><option value="14">14</option>
                         <option value="16">16</option><option value="18">18</option>
-                        <option value="20">20</option><option value="22">22</option><option value="24">24</option>
+                        <option value="20">20</option><option value="22">22</option>
+                        <option value="24">24</option>
                     </select>
                 </td>
-                <td><span class="result" id="totalTeam">0</span></td>
+                <td>
+                  <span class="result" id="totalTeam">0</span>
+                  <span class="info-icon" onclick="toggleInfo('teamBonusInfo')">?</span>
+                  <div id="teamBonusInfo" class="info-box hidden">
+                      <p>將團隊與簽名加成合在一起計算。</p>
+                  </div>
+                </td>
             </tr>
             <!-- 飲料加成 -->
             <tr>
@@ -400,7 +538,8 @@
                 <td colspan="5">
                     <select id="teamDrinks" class="input-stat" onchange="calculate()">
                         <option value="0">0</option>
-                        <option value="-3">-3</option><option value="3">3</option>
+                        <option value="-3">-3</option>
+                        <option value="3">3</option>
                         <option value="6">6</option>
                     </select>
                 </td>
@@ -413,8 +552,11 @@
                 <td colspan="5">
                     <select id="teamMentor" class="input-stat" onchange="calculate()">
                         <option value="0">0</option>
-                        <option value="1">1</option><option value="2">2</option>
+                        <option value="1">1</option>
+                        <option value="2">2</option>
                         <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
                     </select>
                 </td>
                 <td><span class="result" id="totalMentor">0</span></td>
@@ -426,7 +568,8 @@
                 <td colspan="5">
                     <select id="teamDiamond" class="input-stat" onchange="calculate()">
                         <option value="0">0</option>
-                        <option value="1">1</option><option value="2">2</option>
+                        <option value="1">1</option>
+                        <option value="2">2</option>
                     </select>
                 </td>
                 <td><span class="result" id="totalDiamond">0</span></td>
@@ -444,237 +587,356 @@
         </tbody>
     </table>
 
-    <!-- 將「返回上一頁」按鈕移到表格下方 -->
-    <button class="button" style="margin-top: 20px; background-color:#888;" onclick="goBack()">
+    <!-- 功能按鈕區塊 -->
+    <div style="margin-top: 20px;">
+        <button class="button" style="background-color:#888;" onclick="clearAllFields()">
+            清除所有輸入
+        </button>
+    </div>
+
+    <!-- 返回上一頁按鈕 -->
+    <button class="button" style="margin-top: 20px; background-color:#aaa;" onclick="goBack()">
         返回上一頁
     </button>
 </div>
 
 <script>
-    /****************************************
-     * MLB 30隊配色 (只用來改thead顏色)    *
-     ****************************************/
-    const teamDesign = {
-      "NYY": { primaryColor: "#0C2340", textColor: "#FFFFFF" },
-      "BOS": { primaryColor: "#BD3039", textColor: "#FFFFFF" },
-      "TB":  { primaryColor: "#092C5C", textColor: "#FFFFFF" },
-      "TOR": { primaryColor: "#134A8E", textColor: "#FFFFFF" },
-      "BAL": { primaryColor: "#DF4601", textColor: "#000000" },
-      "MIN": { primaryColor: "#002B5C", textColor: "#FFFFFF" },
-      "DET": { primaryColor: "#0C2340", textColor: "#FFFFFF" },
-      "CWS": { primaryColor: "#27251F", textColor: "#FFFFFF" },
-      "CLE": { primaryColor: "#0C2340", textColor: "#FFFFFF" },
-      "KC":  { primaryColor: "#004687", textColor: "#FFFFFF" },
-      "LAA": { primaryColor: "#BA0021", textColor: "#FFFFFF" },
-      "TEX": { primaryColor: "#003278", textColor: "#FFFFFF" },
-      "SEA": { primaryColor: "#0C2C56", textColor: "#FFFFFF" },
-      "OAK": { primaryColor: "#003831", textColor: "#FFFFFF" },
-      "HOU": { primaryColor: "#002D62", textColor: "#FFFFFF" },
-      "PHI": { primaryColor: "#E81828", textColor: "#FFFFFF" },
-      "MIA": { primaryColor: "#00A3E0", textColor: "#000000" },
-      "ATL": { primaryColor: "#CE1141", textColor: "#FFFFFF" },
-      "NYM": { primaryColor: "#002D72", textColor: "#FFFFFF" },
-      "WSH": { primaryColor: "#AB0003", textColor: "#FFFFFF" },
-      "STL": { primaryColor: "#C41E3A", textColor: "#FFFFFF" },
-      "CHC": { primaryColor: "#0E3386", textColor: "#FFFFFF" },
-      "MIL": { primaryColor: "#FFC52F", textColor: "#12284B" },
-      "CIN": { primaryColor: "#C6011F", textColor: "#FFFFFF" },
-      "PIT": { primaryColor: "#FDB827", textColor: "#000000" },
-      "LAD": { primaryColor: "#005A9C", textColor: "#FFFFFF" },
-      "COL": { primaryColor: "#33006F", textColor: "#FFFFFF" },
-      "SF":  { primaryColor: "#FD5A1E", textColor: "#000000" },
-      "SD":  { primaryColor: "#2F241D", textColor: "#FFFFFF" },
-      "AZ":  { primaryColor: "#A71930", textColor: "#FFFFFF" }
-    };
+/****************************************
+ * MLB 30隊配色 (只用來改thead顏色)    *
+ ****************************************/
+const teamDesign = {
+  "NYY": { primaryColor: "#0C2340", textColor: "#FFFFFF" },
+  "BOS": { primaryColor: "#BD3039", textColor: "#FFFFFF" },
+  "TB":  { primaryColor: "#092C5C", textColor: "#FFFFFF" },
+  "TOR": { primaryColor: "#134A8E", textColor: "#FFFFFF" },
+  "BAL": { primaryColor: "#DF4601", textColor: "#000000" },
+  "MIN": { primaryColor: "#002B5C", textColor: "#FFFFFF" },
+  "DET": { primaryColor: "#0C2340", textColor: "#FFFFFF" },
+  "CWS": { primaryColor: "#27251F", textColor: "#FFFFFF" },
+  "CLE": { primaryColor: "#0C2340", textColor: "#FFFFFF" },
+  "KC":  { primaryColor: "#004687", textColor: "#FFFFFF" },
+  "LAA": { primaryColor: "#BA0021", textColor: "#FFFFFF" },
+  "TEX": { primaryColor: "#003278", textColor: "#FFFFFF" },
+  "SEA": { primaryColor: "#0C2C56", textColor: "#FFFFFF" },
+  "OAK": { primaryColor: "#003831", textColor: "#FFFFFF" },
+  "HOU": { primaryColor: "#002D62", textColor: "#FFFFFF" },
+  "PHI": { primaryColor: "#E81828", textColor: "#FFFFFF" },
+  "MIA": { primaryColor: "#00A3E0", textColor: "#000000" },
+  "ATL": { primaryColor: "#CE1141", textColor: "#FFFFFF" },
+  "NYM": { primaryColor: "#002D72", textColor: "#FFFFFF" },
+  "WSH": { primaryColor: "#AB0003", textColor: "#FFFFFF" },
+  "STL": { primaryColor: "#C41E3A", textColor: "#FFFFFF" },
+  "CHC": { primaryColor: "#0E3386", textColor: "#FFFFFF" },
+  "MIL": { primaryColor: "#FFC52F", textColor: "#12284B" },
+  "CIN": { primaryColor: "#C6011F", textColor: "#FFFFFF" },
+  "PIT": { primaryColor: "#FDB827", textColor: "#000000" },
+  "LAD": { primaryColor: "#005A9C", textColor: "#FFFFFF" },
+  "COL": { primaryColor: "#33006F", textColor: "#FFFFFF" },
+  "SF":  { primaryColor: "#FD5A1E", textColor: "#000000" },
+  "SD":  { primaryColor: "#2F241D", textColor: "#FFFFFF" },
+  "AZ":  { primaryColor: "#A71930", textColor: "#FFFFFF" }
+};
 
-    // 切換至第二頁
-    function showPage2() {
-        const playerName = document.getElementById("playerName").value;
-        const year = document.getElementById("year").value;
-        const team = document.getElementById("team").value;
-        const cardType = document.getElementById("cardType").value;
-        const position = document.getElementById("position").value;
+/* ------------ 多欄下拉相關函式 --------------- */
+/** 切換「選擇球隊」下拉的顯示或隱藏 */
+function toggleTeamDropdown() {
+    const dropdown = document.getElementById("teamDropdown");
+    dropdown.classList.toggle("show");
+}
 
-        // 只檢查 team & position
-        if (!team || !position) {
-            alert("請至少填寫『球隊』與『位置』才能進行分析！");
-            return;
-        }
+/** 使得點擊一支球隊時，選中該球隊並關閉下拉 */
+function selectTeam(teamCode) {
+    // 寫入 hidden input
+    document.getElementById("team").value = teamCode;
 
-        // 更新表頭文字（若未填則顯示 - ）
-        document.getElementById("cardTypeAbbreviation").innerText = cardType || "-";
-        const namePart = playerName ? playerName : "";
-        const yearPart = year ? ` (${year})` : "";
-        document.getElementById("header").innerText = namePart + yearPart + (team ? ` - ${team}` : "-");
-        document.getElementById("playerPosition").innerText = position || "-";
+    // 把按鈕文字改為球隊代號 (例如 "SF")
+    const teamButton = document.getElementById("teamButton");
+    teamButton.innerText = teamCode;
+    teamButton.style.color = "#000"; // 調整按鈕文字顏色為黑或依需求
 
-        // 動態更新各能力名稱
-        updateStatHeaders(position);
+    // 關閉下拉
+    document.getElementById("teamDropdown").classList.remove("show");
+}
 
-        // 僅修改 thead 的背景/文字色
-        const theadElement = document.querySelector("#page2 table thead");
-        if (teamDesign[team]) {
-            const { primaryColor, textColor } = teamDesign[team];
-            // 逐格改色 (避免CSS層級衝突)
-            theadElement.querySelectorAll("th").forEach(th => {
-                th.style.backgroundColor = primaryColor;
-                th.style.color = textColor;
-            });
-        } else {
-            // 若無對應配色，保留預設
-            theadElement.querySelectorAll("th").forEach(th => {
-                th.style.backgroundColor = "#023e7d";
-                th.style.color = "#ffffff";
-            });
-        }
+/* 若點擊容器外部區域，也要關閉下拉 */
+window.addEventListener("click", function(e) {
+    const dropdown = document.getElementById("teamDropdown");
+    if (!e.target.matches('#teamButton') && !dropdown.contains(e.target)) {
+        dropdown.classList.remove("show");
+    }
+});
+/* ---------------------------------------------- */
+document.getElementById("cardType").addEventListener("change", function() {
+  if (this.value === "") {
+    this.style.color = "#888";
+  } else {
+    this.style.color = "#000";
+  }
+});
 
-        // 顯示第二頁並隱藏第一頁
-        document.getElementById("page1").classList.add("hidden");
-        document.getElementById("page2").classList.remove("hidden");
+document.getElementById("position").addEventListener("change", function() {
+  if (this.value === "") {
+    this.style.color = "#888";
+  } else {
+    this.style.color = "#000";
+  }
+});
+
+function showPage2() {
+    const playerName = document.getElementById("playerName").value;
+    const year = document.getElementById("year").value;
+    const team = document.getElementById("team").value; // 從 hidden input 取值
+    const cardType = document.getElementById("cardType").value;
+    const position = document.getElementById("position").value;
+
+    // 檢查 team & position
+    if (!team) {
+        alert("請選擇球隊！");
+        return;
+    }
+    if (!position) {
+        alert("請選擇位置！");
+        return;
     }
 
-    // 返回上一頁
-    function goBack() {
-        document.getElementById("page2").classList.add("hidden");
-        document.getElementById("page1").classList.remove("hidden");
+    document.getElementById("cardTypeAbbreviation").innerText = cardType || "-";
+    const namePart = playerName ? playerName : "";
+    const yearPart = year ? ` (${year})` : "";
+    document.getElementById("header").innerText = namePart + yearPart + (team ? ` - ${team}` : "-");
+    document.getElementById("playerPosition").innerText = position || "-";
+
+    // 依照投手/打者位置更新表頭
+    updateStatHeaders(position);
+
+    // 動態改變 thead 配色
+    const theadElement = document.querySelector("#page2 table thead");
+    if (teamDesign[team]) {
+        const { primaryColor, textColor } = teamDesign[team];
+        theadElement.querySelectorAll("th").forEach(th => {
+            th.style.backgroundColor = primaryColor;
+            th.style.color = textColor;
+        });
+    } else {
+        theadElement.querySelectorAll("th").forEach(th => {
+            th.style.backgroundColor = "#023e7d";
+            th.style.color = "#ffffff";
+        });
     }
 
-    // 更新表頭欄位
-    function updateStatHeaders(position) {
-        const statHeaders = document.getElementById("statHeaders");
-        if (["C", "1B", "2B", "SS", "3B", "OF", "DH"].includes(position)) {
-            statHeaders.innerHTML = `
-                <th colspan="2">項目</th>
-                <th>接觸</th>
-                <th>力量</th>
-                <th>選球</th>
-                <th>速度</th>
-                <th>守備</th>
-                <th>加總/平均</th>
-            `;
-        } else if (["SP", "RP", "CP"].includes(position)) {
-            statHeaders.innerHTML = `
-                <th colspan="2">項目</th>
-                <th>控球</th>
-                <th>球威</th>
-                <th>體力</th>
-                <th>直球</th>
-                <th>變化</th>
-                <th>加總/平均</th>
-            `;
-        } else {
-            statHeaders.innerHTML = `
-                <th colspan="2">項目</th>
-                <th>能力1</th>
-                <th>能力2</th>
-                <th>能力3</th>
-                <th>能力4</th>
-                <th>能力5</th>
-                <th>加總/平均</th>
-            `;
+    // 顯示第二頁並隱藏第一頁
+    document.getElementById("page1").classList.add("hidden");
+    document.getElementById("page2").classList.remove("hidden");
+}
+
+/**
+ * 根據位置更新第二行表頭 (含最左的「總開關」checkbox)
+ */
+function updateStatHeaders(position) {
+    const statHeaders = document.getElementById("statHeaders");
+    if (["C", "1B", "2B", "SS", "3B", "OF", "DH"].includes(position)) {
+        statHeaders.innerHTML = `
+            <th>
+                <input type="checkbox" id="toggleAll" checked onclick="toggleAllCheckboxes()">
+            </th>
+            <th>項目</th>
+            <th>接觸</th>
+            <th>力量</th>
+            <th>選球</th>
+            <th>速度</th>
+            <th>守備</th>
+            <th>加總/平均</th>
+        `;
+    } else if (["SP", "RP", "CP"].includes(position)) {
+        statHeaders.innerHTML = `
+            <th>
+                <input type="checkbox" id="toggleAll" checked onclick="toggleAllCheckboxes()">
+            </th>
+            <th>項目</th>
+            <th>控球</th>
+            <th>球威</th>
+            <th>體力</th>
+            <th>直球</th>
+            <th>變化</th>
+            <th>加總/平均</th>
+        `;
+    } else {
+        // 預設結構
+        statHeaders.innerHTML = `
+            <th>
+                <input type="checkbox" id="toggleAll" checked onclick="toggleAllCheckboxes()">
+            </th>
+            <th>項目</th>
+            <th>能力1</th>
+            <th>能力2</th>
+            <th>能力3</th>
+            <th>能力4</th>
+            <th>能力5</th>
+            <th>加總/平均</th>
+        `;
+    }
+}
+
+/**
+ * 全選/全取消的「總開關」
+ */
+function toggleAllCheckboxes() {
+    const masterCheck = document.getElementById("toggleAll");
+    // 依照 masterCheck 勾選與否，切換所有行的checkbox
+    const checkboxes = document.querySelectorAll('#page2 tbody input[type="checkbox"]');
+    checkboxes.forEach(chk => {
+        chk.checked = masterCheck.checked;
+    });
+    calculate();
+}
+
+/**
+ * 返回上一頁
+ */
+function goBack() {
+    document.getElementById("page2").classList.add("hidden");
+    document.getElementById("page1").classList.remove("hidden");
+}
+
+/**
+ * 清除所有輸入
+ */
+function clearAllFields() {
+    // 1) 清除所有 input-stat
+    document.querySelectorAll('.input-stat').forEach(el => {
+        if (el.tagName === "INPUT") {
+            el.value = 0;
+        } else if (el.tagName === "SELECT") {
+            el.selectedIndex = 0; 
         }
-    }
+    });
+    // 2) 重置所有勾選框預設為「全勾選」
+    document.querySelectorAll('#page2 tbody input[type="checkbox"]').forEach(chk => {
+        chk.checked = true;
+    });
+    // 3) 清空 localStorage
+    localStorage.clear();
+    // 4) 重新計算
+    calculate();
+    // 5) 也把總開關toggleAll設為勾選
+    const masterCheck = document.getElementById("toggleAll");
+    if (masterCheck) masterCheck.checked = true;
+}
 
-    // 自動保存
+/**
+ * 顯示/隱藏 說明提示
+ */
+function toggleInfo(infoId) {
+    const infoBox = document.getElementById(infoId);
+    infoBox.classList.toggle("hidden");
+}
+
+/**
+ * 自動保存
+ */
+document.querySelectorAll('input, select').forEach(input => {
+    input.addEventListener('input', () => {
+        localStorage.setItem(input.id, input.value);
+    });
+});
+window.onload = () => {
     document.querySelectorAll('input, select').forEach(input => {
-        input.addEventListener('input', () => {
-            localStorage.setItem(input.id, input.value);
-        });
+        // 如果 localStorage 裡有，就用它覆蓋
+        input.value = localStorage.getItem(input.id) || input.value;
     });
-    window.onload = () => {
+    sessionStorage.setItem("isPageReloaded", "true"); 
+};
+document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "hidden") {
+        sessionStorage.removeItem("isPageReloaded"); 
+    }
+});
+window.addEventListener('beforeunload', (event) => {
+    if (!sessionStorage.getItem("isPageReloaded")) { 
         document.querySelectorAll('input, select').forEach(input => {
-            input.value = localStorage.getItem(input.id) || '';
+            localStorage.removeItem(input.id);
         });
-        sessionStorage.setItem("isPageReloaded", "true"); 
-    };
-    document.addEventListener("visibilitychange", () => {
-        if (document.visibilityState === "hidden") {
-            sessionStorage.removeItem("isPageReloaded"); 
-        }
-    });
-    window.addEventListener('beforeunload', (event) => {
-        if (!sessionStorage.getItem("isPageReloaded")) { 
-            document.querySelectorAll('input, select').forEach(input => {
-                localStorage.removeItem(input.id);
-            });
-        }
-    });
+    }
+});
 
-    // 確保輸入值非負
-    function validatePositive(input) {
-        if (input.value < 0) {
-            input.value = 0;
+/**
+ * 輸入值不為負
+ */
+function validatePositive(input) {
+    if (input.value < 0) {
+        input.value = 0;
+    }
+}
+
+/**
+ * 主計算函式
+ */
+function calculate() {
+    function calcTotal(rowPrefix, outputId, isAverage = false) {
+        let sum = 0;
+        for (let i = 1; i <= 5; i++) {
+            sum += parseInt(document.getElementById(rowPrefix + i).value) || 0;
         }
+        document.getElementById(outputId).innerText = isAverage ? (sum / 5).toFixed(1) : sum;
+        return sum;
+    }
+    function applyColorBasedOnValue(element, value) {
+        if (value < 65)      element.style.color = "#82808B";
+        else if (value < 80) element.style.color = "#878476";
+        else if (value < 100)element.style.color = "#B49011";
+        else if (value < 120)element.style.color = "#D7A415";
+        else if (value < 130)element.style.color = "#F07912";
+        else if (value < 140)element.style.color = "#F54D11";
+        else                 element.style.color = "#FF002D";
     }
 
-    // 計算能力值
-    function calculate() {
-        function calcTotal(rowPrefix, outputId, isAverage = false) {
-            let sum = 0;
-            for (let i = 1; i <= 5; i++) {
-                sum += parseInt(document.getElementById(rowPrefix + i).value) || 0;
-            }
-            document.getElementById(outputId).innerText = isAverage ? (sum / 5).toFixed(1) : sum;
-            return sum;
-        }
-        function applyColorBasedOnValue(element, value) {
-            if (value < 65)      element.style.color = "#82808B";
-            else if (value < 80) element.style.color = "#878476";
-            else if (value < 100)element.style.color = "#B49011";
-            else if (value < 120)element.style.color = "#D7A415";
-            else if (value < 130)element.style.color = "#F07912";
-            else if (value < 140)element.style.color = "#F54D11";
-            else                 element.style.color = "#FF002D";
-        }
+    const baseTotal     = document.getElementById("includeBase").checked     ? calcTotal("base", "totalBase", true) : 0;
+    const levelTotal    = document.getElementById("includeLevel").checked    ? calcTotal("level", "totalLevel")     : 0;
+    const enhanceTotal  = document.getElementById("includeEnhance").checked  ? calcTotal("enhance", "totalEnhance") : 0;
+    const specialTotal  = document.getElementById("includeSpecial").checked  ? calcTotal("special", "totalSpecial") : 0;
+    const coachTotal    = document.getElementById("includeCoach").checked    ? calcTotal("coach", "totalCoach")     : 0;
+    const skillTotal    = document.getElementById("includeSkill").checked    ? calcTotal("skill", "totalSkill")     : 0;
+    const equipTotal    = document.getElementById("includeEquip").checked    ? calcTotal("equip", "totalEquip")     : 0;
+    const teamBonus     = document.getElementById("includeTeamBonus").checked? (parseInt(document.getElementById("teamBonus").value) || 0) * 5 : 0;
+    const drinkTotal    = document.getElementById("includeDrinks").checked   ? (parseInt(document.getElementById("teamDrinks").value) || 0) * 5 : 0;
+    const mentorTotal   = document.getElementById("includeMentor").checked   ? (parseInt(document.getElementById("teamMentor").value) || 0) * 5 : 0;
+    const diamondTotal  = document.getElementById("includeDiamond").checked  ? (parseInt(document.getElementById("teamDiamond").value) || 0) * 5 : 0;
 
-        const baseTotal     = document.getElementById("includeBase").checked     ? calcTotal("base", "totalBase", true) : 0;
-        const levelTotal    = document.getElementById("includeLevel").checked    ? calcTotal("level", "totalLevel")     : 0;
-        const enhanceTotal  = document.getElementById("includeEnhance").checked  ? calcTotal("enhance", "totalEnhance") : 0;
-        const specialTotal  = document.getElementById("includeSpecial").checked  ? calcTotal("special", "totalSpecial") : 0;
-        const coachTotal    = document.getElementById("includeCoach").checked    ? calcTotal("coach", "totalCoach")     : 0;
-        const skillTotal    = document.getElementById("includeSkill").checked    ? calcTotal("skill", "totalSkill")     : 0;
-        const equipTotal    = document.getElementById("includeEquip").checked    ? calcTotal("equip", "totalEquip")     : 0;
-        const teamBonus     = document.getElementById("includeTeamBonus").checked? (parseInt(document.getElementById("teamBonus").value) || 0) * 5 : 0;
-        const drinkTotal    = document.getElementById("includeDrinks").checked   ? (parseInt(document.getElementById("teamDrinks").value) || 0) * 5 : 0;
-        const mentorTotal   = document.getElementById("includeMentor").checked   ? (parseInt(document.getElementById("teamMentor").value) || 0) * 5 : 0;
-        const diamondTotal  = document.getElementById("includeDiamond").checked  ? (parseInt(document.getElementById("teamDiamond").value) || 0) * 5 : 0;
+    // 行小計顯示
+    document.getElementById("totalTeam").innerText   = teamBonus;
+    document.getElementById("totalDrinks").innerText = drinkTotal;
+    document.getElementById("totalMentor").innerText = mentorTotal;
+    document.getElementById("totalDiamond").innerText= diamondTotal;
 
-        // 顯示行小計
-        document.getElementById("totalTeam").innerText   = teamBonus;
-        document.getElementById("totalDrinks").innerText = drinkTotal;
-        document.getElementById("totalMentor").innerText = mentorTotal;
-        document.getElementById("totalDiamond").innerText= diamondTotal;
+    // 逐欄計算
+    for (let i = 1; i <= 5; i++) {
+        let finalValue = 0;
+        if (document.getElementById("includeBase").checked)       finalValue += parseInt(document.getElementById("base" + i).value) || 0;
+        if (document.getElementById("includeLevel").checked)      finalValue += parseInt(document.getElementById("level" + i).value) || 0;
+        if (document.getElementById("includeEnhance").checked)    finalValue += parseInt(document.getElementById("enhance" + i).value) || 0;
+        if (document.getElementById("includeSpecial").checked)    finalValue += parseInt(document.getElementById("special" + i).value) || 0;
+        if (document.getElementById("includeCoach").checked)      finalValue += parseInt(document.getElementById("coach" + i).value) || 0;
+        if (document.getElementById("includeSkill").checked)      finalValue += parseInt(document.getElementById("skill" + i).value) || 0;
+        if (document.getElementById("includeEquip").checked)      finalValue += parseInt(document.getElementById("equip" + i).value) || 0;
+        if (document.getElementById("includeTeamBonus").checked)  finalValue += teamBonus / 5; 
+        if (document.getElementById("includeDrinks").checked)     finalValue += drinkTotal / 5;
+        if (document.getElementById("includeMentor").checked)     finalValue += mentorTotal / 5;
+        if (document.getElementById("includeDiamond").checked)    finalValue += diamondTotal / 5;
 
-        // 分別計算 5 個能力欄位
-        for (let i = 1; i <= 5; i++) {
-            let finalValue = 0;
-            if (document.getElementById("includeBase").checked)       finalValue += parseInt(document.getElementById("base" + i).value) || 0;
-            if (document.getElementById("includeLevel").checked)      finalValue += parseInt(document.getElementById("level" + i).value) || 0;
-            if (document.getElementById("includeEnhance").checked)    finalValue += parseInt(document.getElementById("enhance" + i).value) || 0;
-            if (document.getElementById("includeSpecial").checked)    finalValue += parseInt(document.getElementById("special" + i).value) || 0;
-            if (document.getElementById("includeCoach").checked)      finalValue += parseInt(document.getElementById("coach" + i).value) || 0;
-            if (document.getElementById("includeSkill").checked)      finalValue += parseInt(document.getElementById("skill" + i).value) || 0;
-            if (document.getElementById("includeEquip").checked)      finalValue += parseInt(document.getElementById("equip" + i).value) || 0;
-            if (document.getElementById("includeTeamBonus").checked)  finalValue += teamBonus / 5;
-            if (document.getElementById("includeDrinks").checked)     finalValue += drinkTotal / 5;
-            if (document.getElementById("includeMentor").checked)     finalValue += mentorTotal / 5;
-            if (document.getElementById("includeDiamond").checked)    finalValue += diamondTotal / 5;
-
-            const overallElement = document.getElementById("overall" + i);
-            overallElement.innerText = finalValue.toFixed(0);
-            applyColorBasedOnValue(overallElement, finalValue);
-        }
-
-        // 計算總評平均
-        let overallSum = 0;
-        for (let i = 1; i <= 5; i++) {
-            overallSum += parseFloat(document.getElementById("overall" + i).innerText) || 0;
-        }
-        const overallTotalElement = document.getElementById("overallTotal");
-        const overallTotalValue = (overallSum / 5).toFixed(1);
-        overallTotalElement.innerText = overallTotalValue;
-        applyColorBasedOnValue(overallTotalElement, parseFloat(overallTotalValue));
+        const overallElement = document.getElementById("overall" + i);
+        overallElement.innerText = finalValue.toFixed(0);
+        applyColorBasedOnValue(overallElement, finalValue);
     }
+
+    // 總評
+    let overallSum = 0;
+    for (let i = 1; i <= 5; i++) {
+        overallSum += parseFloat(document.getElementById("overall" + i).innerText) || 0;
+    }
+    const overallTotalElement = document.getElementById("overallTotal");
+    const overallTotalValue = (overallSum / 5).toFixed(1);
+    overallTotalElement.innerText = overallTotalValue;
+    applyColorBasedOnValue(overallTotalElement, parseFloat(overallTotalValue));
+}
 </script>
 
 <!-- Footer 版權區域 -->

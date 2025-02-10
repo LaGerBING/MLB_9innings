@@ -701,7 +701,7 @@ function showPage2() {
 
     document.getElementById("cardTypeAbbreviation").innerText = cardType || "-";
     const namePart = playerName ? playerName : "";
-    const yearPart = year ? ` (${year})` : "";
+    const yearPart = year ? ` '${year}` : "";
     document.getElementById("header").innerText = namePart + yearPart + (team ? ` - ${team}` : "-");
     document.getElementById("playerPosition").innerText = position || "-";
 
